@@ -1,0 +1,17 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Photo Resizer",
+  "version": "1.0.0",
+  "identifier": "com.example.photoresizer",
+  "build": { "frontendDist": "../src" },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [{ "title": "Photo Resizer", "width": 1200, "height": 780, "minWidth": 960, "minHeight": 620 }],
+    "security": { "csp": null, "assetProtocol": { "enable": true, "scope": ["**"] } }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.icns", "icons/icon.ico"]
+  }
+}

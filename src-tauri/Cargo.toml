@@ -1,0 +1,22 @@
+[package]
+name = "photo-resizer"
+version = "1.0.0"
+edition = "2021"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["protocol-asset"] }
+tauri-plugin-dialog = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+image = { version = "0.25", default-features = false, features = ["jpeg", "png", "gif", "webp", "tiff", "bmp"] }
+ab_glyph = "0.2"
+base64 = "0.22"
+
+# the image crate is very slow unoptimised, so keep it fast in dev builds too
+[profile.dev.package."*"]
+opt-level = 3
+[profile.dev.package.photo-resizer]
+opt-level = 3

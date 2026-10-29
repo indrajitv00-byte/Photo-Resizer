@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8">
+<title>Photo Resizer</title>
+<style>
+:root{--bg:#f4f5f8;--card:#fff;--ink:#1c2030;--mute:#6b7285;--line:#e3e6ee;--ac:#4f46e5;--ac2:#eef0ff;--ok:#16a34a;--err:#dc2626}
+@media(prefers-color-scheme:dark){:root{--bg:#14161d;--card:#1d2029;--ink:#eceef5;--mute:#9aa1b5;--line:#2c3040;--ac:#818cf8;--ac2:#252a4a}}
+*{box-sizing:border-box}body{margin:0;font:14px -apple-system,"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--ink);height:100vh;overflow:hidden;display:grid;grid-template-columns:minmax(0,1fr) 340px;grid-template-rows:auto 1fr auto}
+header{grid-column:1/3;padding:14px 20px;display:flex;gap:10px;align-items:center;background:var(--card);border-bottom:1px solid var(--line)}
+header h1{font-size:16px;margin:0 auto 0 0}
+button{font:inherit;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 14px;border-radius:8px;cursor:pointer}
+button:hover{border-color:var(--ac)}button.p{background:var(--ac);color:#fff;border-color:var(--ac);font-weight:600}button:disabled{opacity:.5;cursor:default}
+main{min-height:0;min-width:0;overflow:hidden;display:flex;flex-direction:column}#list{overflow:auto;padding:16px;position:relative;flex:1}main.has #list{flex:none;height:140px;padding:10px 16px;border-top:1px solid var(--line);background:var(--card)}main:not(.has) #pv{display:none}#pv{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;padding:16px}.pane{display:flex;flex-direction:column;min-height:0}.pane h4{margin:0 0 8px;font-size:13px;color:var(--mute);font-weight:600}.box{flex:1;min-height:0;position:relative;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:repeating-conic-gradient(#8881 0 25%,#0000 0 50%) 0 0/16px 16px,var(--card)}.box img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}.box em{position:absolute;top:8px;right:8px;background:var(--ac);color:#fff;padding:3px 10px;border-radius:12px;font-size:12px;font-style:normal}.pane p{margin:8px 0 0;font-size:13px;color:var(--mute);min-height:18px}.pane p b{color:var(--ink)}.it{cursor:pointer}.it.sel{outline:2px solid var(--ac);outline-offset:-2px}
+#drop{border:2px dashed var(--line);border-radius:14px;height:100%;min-height:240px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--mute);gap:6px;text-align:center}
+#drop b{font-size:16px;color:var(--ink)}body.over #list{outline:2px dashed var(--ac);outline-offset:-8px}
+.grid{display:grid;grid-auto-flow:column;grid-auto-columns:110px;gap:10px}
+.it{background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;position:relative}
+.it img{width:100%;height:64px;object-fit:cover;display:block;background:var(--line)}
+.it span{display:block;padding:6px 8px;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.it i{position:absolute;top:4px;right:4px;background:#000a;color:#fff;border-radius:50%;width:20px;height:20px;text-align:center;line-height:20px;font-style:normal;cursor:pointer;font-size:12px}
+aside{background:var(--card);border-left:1px solid var(--line);overflow:auto;padding:6px 16px 16px}
+details{border-bottom:1px solid var(--line);padding:10px 0}summary{font-weight:600;cursor:pointer;padding:4px 0}
+label{display:flex;align-items:center;gap:8px;margin:8px 0;color:var(--mute)}label>*:last-child:not(input[type=checkbox]):not(input[type=radio]){margin-left:auto}
+input[type=number],input[type=text],select{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:5px 8px;width:110px}
+input[type=text]{width:160px}select{width:auto;max-width:180px}input[type=range]{width:140px;accent-color:var(--ac)}
+.row{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}.row button{padding:5px 10px;font-size:12px}.row button.on{background:var(--ac2);border-color:var(--ac);color:var(--ac)}
+footer{grid-column:1/3;background:var(--card);border-top:1px solid var(--line);padding:12px 20px;display:flex;align-items:center;gap:14px}
+#bar{flex:1;height:8px;background:var(--line);border-radius:4px;overflow:hidden}#bar div{height:100%;width:0;background:var(--ac);transition:width .15s}
+#msg{color:var(--mute);min-width:200px}.hide{display:none!important}
+</style></head><body>
+<header><h1>📷 Photo Resizer</h1>
+<button id="addF">Add files</button><button id="addD">Add folder</button><button id="clr">Clear</button></header>
+
+<main id="main"><div id="pv"><div class="pane"><h4 id="hA">Original</h4><div class="box"><img id="pvA" alt=""></div><p id="capA"></p></div><div class="pane"><h4>Preview with your settings</h4><div class="box"><img id="pvB" alt=""><em id="busy" class="hide">Updating…</em></div><p id="capB"></p></div></div><div id="list"><div id="drop"><b>Drop photos or folders here</b>or use “Add files” above<small>JPG · PNG · WebP · TIFF · GIF · BMP</small></div><div class="grid hide" id="grid"></div></div></main>
+
+<aside>
+<details open><summary>1 · Output format</summary>
+<label>Format<select id="format"><option value="same">Same as original</option><option>jpg</option><option>png</option><option>webp</option><option>bmp</option><option>tiff</option><option>gif</option></select></label>
+<label>Quality<input type="range" id="quality" min="10" max="100" value="85"><output id="qv">85</output></label>
+<small style="color:var(--mute)">Quality applies to JPG. WebP is saved lossless. Metadata is removed.</small></details>
+
+<details open><summary>2 · Resize</summary>
+<label>Mode<select id="resize"><option value="none">Don’t resize</option><option value="pixels">In pixels</option><option value="percent">In percentage</option><option value="print">In print size</option><option value="side">Based on one side</option></select></label>
+<div id="r-pixels" class="hide"><label>Width<input type="number" id="width" min="0"></label><label>Height<input type="number" id="height" min="0"></label><label>Standard size<select id="rstd" data-t="width,height"></select></label>
+<label><input type="checkbox" id="rSwitch">Switch width and height to match long sides</label><label><input type="checkbox" id="keepRatio" checked>Preserve aspect ratio</label><label><input type="checkbox" id="smartCrop">Smart-cropping (exact width and height)</label><label><input type="checkbox" id="smartFill">Smart-filling (exact width and height)</label><label>Fill color<input type="color" id="fillColor" value="#ffffff"></label></div>
+<div id="r-percent" class="hide"><label>Percent<input type="number" id="percent" value="50" min="1" max="500"></label></div>
+<div id="r-print" class="hide"><label>Width<input type="number" id="pw" min="0" step="0.1" value="10"></label><label>Height<input type="number" id="ph" min="0" step="0.1" value="15"></label><label>Unit<select id="punit"><option>cm</option><option>in</option></select></label><label>DPI<input type="number" id="pdpi" value="300"></label></div>
+<div id="r-side" class="hide"><label>Side<select id="sideKind"><option value="width">Width</option><option value="height">Height</option><option value="long">Longest side</option><option value="short">Shortest side</option></select></label><label>Exactly (px)<input type="number" id="side" value="1920" min="1"></label><small style="color:var(--mute)">Aspect ratio is always preserved</small></div>
+<label>Filter<select id="filter"><option value="lanczos3">Lanczos3 (default)</option><option value="cubic">Cubic (sharper)</option><option value="triangle">Bilinear (soft)</option><option value="nearest">Nearest (fastest)</option></select></label>
+<label><input type="checkbox" id="noEnlarge">Do not resize if image is already smaller than requested size</label></details>
+
+<details><summary>3 · Crop</summary>
+<label>Mode<select id="crop"><option value="none">Don’t crop</option><option value="pixels">In pixels</option><option value="print">In print size</option><option value="ratio">In aspect ratio</option></select></label>
+<div id="c-box" class="hide">
+<div id="c-pixels"><label>Width<input type="number" id="cw" min="1" value="640"></label><label>Height<input type="number" id="ch" min="1" value="480"></label><label>Standard size<select id="cstd" data-t="cw,ch"></select></label></div>
+<div id="c-print" class="hide"><label>Width<input type="number" id="cpw" min="0" step="0.1" value="10"></label><label>Height<input type="number" id="cph" min="0" step="0.1" value="15"></label><label>Unit<select id="cunit"><option>cm</option><option>in</option></select></label><label>DPI<input type="number" id="cdpi" value="300"></label></div>
+<div id="c-ratio" class="hide"><label>Ratio W : H<span><input type="number" id="crw" value="4" style="width:60px"> : <input type="number" id="crh" value="3" style="width:60px"></span></label></div>
+<label><input type="checkbox" id="cSwitch" checked>Switch width and height to match long sides</label>
+<label><input type="checkbox" id="cxy">Specify X-Y coordinate (upper left corner)</label>
+<div id="c-xy" class="hide"><label>X<input type="number" id="cx" value="0" min="0"></label><label>Y<input type="number" id="cy" value="0" min="0"></label></div>
+<small style="color:var(--mute)">Without X-Y, the crop is centered.</small></div></details>
+
+<details><summary>4 · Canvas</summary>
+<label>Mode<select id="canvas"><option value="none">Don’t change canvas</option><option value="pixels">In pixels</option><option value="percent">In percentage</option><option value="expand">Expand mode (add space)</option></select></label>
+<div id="v-pixels" class="hide"><label>Width<input type="number" id="vw" min="1" value="400"></label><label>Height<input type="number" id="vh" min="1" value="225"></label><label>Standard size<select id="vstd" data-t="vw,vh"></select></label><label><input type="checkbox" id="vSwitch">Switch values if it is a portrait image</label></div>
+<div id="v-percent" class="hide"><label>Percent<input type="number" id="vp" value="120" min="1"></label></div>
+<div id="v-expand" class="hide"><label>Add space on each side (px)<input type="number" id="ve" value="50" min="0"></label></div>
+<label id="v-bgl" class="hide">Background color<input type="color" id="vbg" value="#ffffff"></label></details>
+
+<details><summary>5 · Transform &amp; effects</summary>
+<div class="row" id="rot"><button data-r="0" class="on">0°</button><button data-r="90">90°</button><button data-r="180">180°</button><button data-r="270">270°</button></div>
+<label><input type="checkbox" id="flipH">Flip horizontal</label><label><input type="checkbox" id="flipV">Flip vertical</label>
+<label><input type="checkbox" id="grayscale">Black &amp; white</label>
+<label>Border (px)<input type="number" id="border" min="0" value="0"></label><label>Border color<input type="color" id="borderColor" value="#ffffff"></label></details>
+
+<details><summary>6 · Text watermark</summary>
+<label>Text<input type="text" id="wmText" placeholder="© Your name"></label>
+<label>Position<select id="wmPos"><option value="br">Bottom right</option><option value="bl">Bottom left</option><option value="tr">Top right</option><option value="tl">Top left</option><option value="c">Center</option></select></label>
+<label>Size %<input type="range" id="wmSize" min="2" max="20" value="5"></label>
+<label>Opacity<input type="range" id="wmOp" min="10" max="100" value="70"></label></details>
+
+<details open><summary>7 · Save to</summary>
+<label>Folder<button id="pickOut" style="padding:5px 10px">Choose…</button></label><div id="outShow" style="font-size:12px;color:var(--mute);word-break:break-all">Same folder as originals</div>
+<label>Rename<input type="text" id="rename" placeholder="vacation_###"></label>
+<label>Suffix<input type="text" id="suffix" value="_resized"></label>
+<label>If file exists<select id="conflict"><option value="rename">Add a number</option><option value="skip">Skip</option><option value="overwrite">Overwrite</option></select></label></details>
+</aside>
+
+<footer><span id="msg">No images yet</span><div id="bar"><div></div></div><button class="p" id="go" disabled>Convert</button></footer>
+
+<script>
+const T=window.__TAURI__,inv=T.core.invoke;
+const api={
+ pickFiles:async()=>(await T.dialog.open({multiple:true,filters:[{name:'Images',extensions:['jpg','jpeg','png','webp','tif','tiff','gif','bmp']}]}))||[],
+ pickFolder:async()=>(await T.dialog.open({directory:true}))||null,
+ expand:paths=>inv('expand',{paths}),
+ preview:(path,opts)=>inv('preview',{path,opts}).then(r=>({ok:true,...r}),e=>({ok:false,error:String(e)})),
+ run:(files,opts)=>inv('run',{files,opts}),
+ reveal:path=>inv('reveal',{path}),
+ onProgress:cb=>T.event.listen('progress',e=>cb(e.payload)),
+};
+const $=id=>document.getElementById(id);let files=[],outDir=null,rotate=0;
+const fileUrl=p=>T.core.convertFileSrc(p);
+let sel=0,tok=0,timer;
+const fmtB=b=>b>1048576?(b/1048576).toFixed(2)+' MB':Math.max(1,Math.round(b/1024))+' KB';
+function opts(){const n=id=>+$(id).value||0,c=id=>$(id).checked;
+ return{format:$('format').value,quality:n('quality'),resize:$('resize').value,width:n('width'),height:n('height'),rSwitch:c('rSwitch'),keepRatio:c('keepRatio'),smartCrop:c('smartCrop'),smartFill:c('smartFill'),fillColor:$('fillColor').value,percent:n('percent'),pw:n('pw'),ph:n('ph'),punit:$('punit').value,pdpi:n('pdpi')||300,sideKind:$('sideKind').value,side:n('side'),filter:$('filter').value,noEnlarge:c('noEnlarge'),crop:{mode:$('crop').value,w:n('cw'),h:n('ch'),pw:n('cpw'),ph:n('cph'),unit:$('cunit').value,dpi:n('cdpi')||300,rw:n('crw')||1,rh:n('crh')||1,sw:c('cSwitch'),xy:c('cxy'),x:n('cx'),y:n('cy')},canvas:{mode:$('canvas').value,w:n('vw'),h:n('vh'),sw:c('vSwitch'),pct:n('vp'),add:n('ve'),bg:$('vbg').value},rotate,flipH:c('flipH'),flipV:c('flipV'),grayscale:c('grayscale'),border:n('border'),borderColor:$('borderColor').value,
+ watermark:{text:$('wmText').value,pos:$('wmPos').value,size:n('wmSize'),opacity:n('wmOp')},outDir,rename:$('rename').value.trim(),suffix:outDir||$('rename').value?'':$('suffix').value,conflict:$('conflict').value}}
+function schedule(delay=350){clearTimeout(timer);if(!files.length)return;
+ timer=setTimeout(async()=>{const my=++tok;$('busy').classList.remove('hide');
+  const r=await api.preview(files[sel],opts());if(my!==tok)return;$('busy').classList.add('hide');
+  if(!r.ok){$('capB').textContent='Preview failed: '+r.error;return}
+  $('pvB').src=r.url;$('capA').innerHTML=`<b>${r.orig.w} × ${r.orig.h}</b> · ${fmtB(r.orig.bytes)}`;
+  const pct=Math.round((1-r.res.bytes/r.orig.bytes)*100);
+  $('capB').innerHTML=`<b>${r.res.w} × ${r.res.h}</b> · ${fmtB(r.res.bytes)} · ${r.fmt.toUpperCase()} · ${pct>=0?pct+'% smaller':-pct+'% larger'}`},delay)}
+function render(){const g=$('grid');$('main').classList.toggle('has',files.length>0);$('drop').classList.toggle('hide',files.length>0);g.classList.toggle('hide',!files.length);
+ if(sel>=files.length)sel=Math.max(0,files.length-1);
+ g.innerHTML=files.map((f,i)=>`<div class="it${i===sel?' sel':''}" data-s="${i}"><img loading="lazy" decoding="async" src="${fileUrl(f)}"><i data-i="${i}">✕</i><span title="${f}">${f.split(/[\\/]/).pop()}</span></div>`).join('');
+ $('go').disabled=!files.length;$('msg').textContent=files.length?files.length+' image(s) ready':'No images yet';$('bar').firstChild.style.width='0';
+ if(files.length)pick(sel)}
+function pick(i){if(i<0||i>=files.length)return;sel=i;[...$('grid').children].forEach((c,k)=>c.classList.toggle('sel',k===i));$('grid').children[i].scrollIntoView({inline:'center',block:'nearest'});$('pvA').src=fileUrl(files[i]);$('hA').textContent=`Original · ${i+1} of ${files.length}`;schedule(0)}
+addEventListener('keydown',e=>{if(/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName))return;if(e.key==='ArrowRight')pick(sel+1);if(e.key==='ArrowLeft')pick(sel-1)});
+async function add(paths){const found=await api.expand(paths);files=[...new Set([...files,...found])];render()}
+$('addF').onclick=async()=>add(await api.pickFiles());
+$('addD').onclick=async()=>{const d=await api.pickFolder();if(d)add([d])};
+$('clr').onclick=()=>{files=[];render()};
+$('grid').onclick=e=>{if(e.target.dataset.i){files.splice(+e.target.dataset.i,1);render();return}
+ const it=e.target.closest('.it');if(it)pick(+it.dataset.s)};
+const side=document.querySelector('aside');side.addEventListener('input',()=>schedule());side.addEventListener('click',e=>{if(e.target.closest('#rot'))schedule()});
+T.webview.getCurrentWebview().onDragDropEvent(e=>{const t=e.payload.type;document.body.classList.toggle('over',t==='over'||t==='enter');if(t==='drop')add(e.payload.paths)});
+$('quality').oninput=e=>$('qv').textContent=e.target.value;
+const show=(ids,on)=>ids.forEach(i=>$(i).classList.toggle('hide',!on.includes(i)));
+$('resize').onchange=()=>{const v=$('resize').value;['pixels','percent','print','side'].forEach(m=>$('r-'+m).classList.toggle('hide',v!==m))};
+$('crop').onchange=()=>{const v=$('crop').value;$('c-box').classList.toggle('hide',v==='none');['pixels','print','ratio'].forEach(m=>$('c-'+m).classList.toggle('hide',v!==m))};
+$('cxy').onchange=()=>$('c-xy').classList.toggle('hide',!$('cxy').checked);
+$('canvas').onchange=()=>{const v=$('canvas').value;['pixels','percent','expand'].forEach(m=>$('v-'+m).classList.toggle('hide',v!==m));$('v-bgl').classList.toggle('hide',v==='none')};
+const STD=['','640x480','800x600','1024x768','1280x720','1600x1200','1920x1080','2560x1440','3840x2160','1080x1080','1080x1350','1200x630','400x225'];
+document.querySelectorAll('select[data-t]').forEach(s=>{s.innerHTML=STD.map(v=>`<option value="${v}">${v?v.replace('x',' × '):'<Pick a standard size>'}</option>`).join('');
+ s.onchange=()=>{if(!s.value)return;const[w,hh]=s.value.split('x'),[a,b]=s.dataset.t.split(',');$(a).value=w;$(b).value=hh;s.value='';schedule()}});
+$('rot').onclick=e=>{if(!e.target.dataset.r)return;rotate=+e.target.dataset.r;[...$('rot').children].forEach(b=>b.classList.toggle('on',b===e.target))};
+$('pickOut').onclick=async()=>{const d=await api.pickFolder();if(d){outDir=d;$('outShow').textContent=d}};
+api.onProgress(({i,n})=>{$('bar').firstChild.style.width=(i/n*100)+'%';$('msg').textContent=`Processing ${i} / ${n}`});
+$('go').onclick=async()=>{$('go').disabled=true;
+ const o=opts();
+ const r=await api.run(files,o);
+ $('msg').textContent=`Done: ${r.done} converted, ${r.skipped} skipped, ${r.failed.length} failed`;
+ if(r.failed.length)alert(r.failed.map(f=>f.file+'\n'+f.error).join('\n\n'));
+ else if(confirm('Finished! Open the output folder?'))api.reveal(outDir||files[0].replace(/[\\/][^\\/]*$/,''));
+ $('go').disabled=false};
+</script></body></html>
