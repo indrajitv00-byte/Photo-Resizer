@@ -107,5 +107,5 @@ fn main() {
             pdf_compress
         ])
         .run(tauri::generate_context!())
-        .expect("error while running Photo Resizer");
+        .expect("error while running Photo and PDF Toolkit");
 }
