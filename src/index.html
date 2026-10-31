@@ -6,7 +6,7 @@
 @media(prefers-color-scheme:dark){:root{--bg:#14161d;--card:#1d2029;--ink:#eceef5;--mute:#9aa1b5;--line:#2c3040;--ac:#818cf8;--ac2:#252a4a}}
 *{box-sizing:border-box}body{margin:0;font:14px -apple-system,"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--ink);height:100vh;overflow:hidden;display:grid;grid-template-columns:minmax(0,1fr) 340px;grid-template-rows:auto 1fr auto}
 header{grid-column:1/3;padding:14px 20px;display:flex;gap:10px;align-items:center;background:var(--card);border-bottom:1px solid var(--line)}
-header h1{font-size:16px;margin:0 auto 0 0}
+header h1{font-size:16px;margin:0 12px 0 0}
 button{font:inherit;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 14px;border-radius:8px;cursor:pointer}
 button:hover{border-color:var(--ac)}button.p{background:var(--ac);color:#fff;border-color:var(--ac);font-weight:600}button:disabled{opacity:.5;cursor:default}
 main{min-height:0;min-width:0;overflow:hidden;display:flex;flex-direction:column}#list{overflow:auto;padding:16px;position:relative;flex:1}main.has #list{flex:none;height:140px;padding:10px 16px;border-top:1px solid var(--line);background:var(--card)}main:not(.has) #pv{display:none}#pv{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;padding:16px}.pane{display:flex;flex-direction:column;min-height:0}.pane h4{margin:0 0 8px;font-size:13px;color:var(--mute);font-weight:600}.box{flex:1;min-height:0;position:relative;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:repeating-conic-gradient(#8881 0 25%,#0000 0 50%) 0 0/16px 16px,var(--card)}.box img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}.box em{position:absolute;top:8px;right:8px;background:var(--ac);color:#fff;padding:3px 10px;border-radius:12px;font-size:12px;font-style:normal}.pane p{margin:8px 0 0;font-size:13px;color:var(--mute);min-height:18px}.pane p b{color:var(--ink)}.it{cursor:pointer}.it.sel{outline:2px solid var(--ac);outline-offset:-2px}
@@ -26,9 +26,20 @@ input[type=text]{width:160px}select{width:auto;max-width:180px}input[type=range]
 footer{grid-column:1/3;background:var(--card);border-top:1px solid var(--line);padding:12px 20px;display:flex;align-items:center;gap:14px}
 #bar{flex:1;height:8px;background:var(--line);border-radius:4px;overflow:hidden}#bar div{height:100%;width:0;background:var(--ac);transition:width .15s}
 #msg{color:var(--mute);min-width:200px}.hide{display:none!important}
+#tabs{display:flex;gap:4px;margin-right:auto}#tabs button{background:none;border-color:transparent;color:var(--mute);font-weight:600}#tabs button:hover{border-color:var(--line)}#tabs button.on{background:var(--ac2);border-color:var(--ac);color:var(--ac)}#imgBtns{display:flex;gap:10px}
+#pdf{display:none;grid-column:1/3;grid-row:2/4;grid-template-columns:minmax(0,1fr) 340px;min-height:0}
+body.pdf main,body.pdf aside,body.pdf footer,body.pdf #imgBtns{display:none}body.pdf #pdf{display:grid}
+#pMain{display:flex;flex-direction:column;min-height:0;min-width:0}#pBody{flex:1;min-height:0;overflow:auto;padding:16px}body.over #pBody{outline:2px dashed var(--ac);outline-offset:-8px}
+#pDrop{border:2px dashed var(--line);border-radius:14px;height:100%;min-height:240px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--mute);gap:6px;text-align:center}#pDrop b{font-size:16px;color:var(--ink)}
+.pr{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:8px}.pr.bad{border-color:var(--err)}
+.pr .n{width:22px;text-align:center;color:var(--mute);font-weight:600}.pr .nm{flex:1;min-width:0}.pr .nm b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pr .nm small{color:var(--mute)}.pr .nm small.ok{color:var(--ok)}.pr .nm small.er{color:var(--err)}.pr button{padding:4px 9px;font-size:12px}
+#pSide{background:var(--card);border-left:1px solid var(--line);overflow:auto;padding:6px 16px 16px}#pSide p{margin:6px 0;color:var(--mute);line-height:1.45}
+#pFoot{background:var(--card);border-top:1px solid var(--line);padding:12px 20px;display:flex;align-items:center;gap:14px}#pFoot #pMsg{flex:1;color:var(--mute);min-width:0}
+#pBar{width:180px;height:8px;background:var(--line);border-radius:4px;overflow:hidden}#pBar div{height:100%;width:0;background:var(--ac);transition:width .15s}
 </style></head><body>
 <header><h1><img src="logo.png" height="26" style="vertical-align:middle"> Photo Resizer</h1>
-<button id="addF">Add files</button><button id="addD">Add folder</button><button id="clr">Clear</button></header>
+<nav id="tabs"><button data-t="img" class="on">Images</button><button data-t="merge">Merge PDF</button><button data-t="split">Split PDF</button><button data-t="comp">Compress PDF</button></nav>
+<div id="imgBtns"><button id="addF">Add files</button><button id="addD">Add folder</button><button id="clr">Clear</button></div></header>
 
 <main id="main"><div id="pv"><div class="pane"><h4 id="hA">Original</h4><div class="box"><img id="pvA" alt=""></div><p id="capA"></p></div><div class="pane"><h4>Preview with your settings</h4><div class="box"><img id="pvB" alt=""><em id="busy" class="hide">Updating…</em></div><p id="capB"></p></div></div><div id="list"><div id="drop"><b>Drop photos or folders here</b>or use “Add files” above<small>JPG · PNG · WebP · TIFF · GIF · BMP</small></div><div class="grid hide" id="grid"></div></div></main>
 
@@ -87,6 +98,28 @@ footer{grid-column:1/3;background:var(--card);border-top:1px solid var(--line);p
 
 <footer><span id="msg">No images yet</span><div id="bar"><div></div></div><button class="p" id="go" disabled>Convert</button></footer>
 
+<div id="pdf">
+<div id="pMain">
+<div id="pBody"><div id="pDrop"><b>Drop PDF files here</b>or use the button below<small>Everything stays on your computer</small></div><div id="pList" class="hide"></div></div>
+<div id="pFoot"><button id="pAdd">Add PDFs</button><button id="pClr">Clear</button><span id="pMsg">Add PDFs to begin</span><div id="pBar"><div></div></div><button class="p" id="pGo" disabled>Merge</button></div>
+</div>
+<div id="pSide">
+<details open id="o-merge"><summary>Merge PDFs</summary>
+<p>PDFs are joined in the order shown on the left. Use ↑ and ↓ to change the order. You choose where to save the merged file when you click Merge.</p>
+<p>Bookmarks and form fields are not carried over.</p></details>
+<details open id="o-split" class="hide"><summary>Split PDF</summary>
+<label>Mode<select id="sMode"><option value="ranges">Separate files by page range</option><option value="extract">Extract pages into one file</option><option value="every">Every N pages</option></select></label>
+<label id="sSpecL">Pages<input type="text" id="sSpec" placeholder="1-3, 4-6, 7-" style="width:190px"></label>
+<label id="sNL" class="hide">Pages per file<input type="number" id="sN" min="1" value="1"></label>
+<p id="sHelp">Each range becomes its own file. Example: 1-3, 4-6, 7-</p><p id="sPages"></p></details>
+<details open id="o-comp" class="hide"><summary>Compress PDF</summary>
+<label>Level<select id="cLevel"><option value="light">Light (best quality)</option><option value="balanced" selected>Balanced</option><option value="strong">Strong (smallest file)</option></select></label>
+<p>Shrinks the photos and scans inside the PDF. PDFs that are mostly text will not get much smaller. Your original file is never changed; a new “_compressed” copy is saved.</p></details>
+<details open id="o-save" class="hide"><summary>Save to</summary>
+<label>Folder<button id="pPick" style="padding:5px 10px">Choose…</button></label><div id="pOutShow" style="font-size:12px;color:var(--mute);word-break:break-all">Same folder as original</div></details>
+</div>
+</div>
+
 <script>
 const T=window.__TAURI__,inv=T.core.invoke;
 const api={
@@ -118,7 +151,7 @@ function render(){const g=$('grid');$('main').classList.toggle('has',files.lengt
  $('go').disabled=!files.length;$('msg').textContent=files.length?files.length+' image(s) ready':'No images yet';$('bar').firstChild.style.width='0';
  if(files.length)pick(sel)}
 function pick(i){if(i<0||i>=files.length)return;sel=i;[...$('grid').children].forEach((c,k)=>c.classList.toggle('sel',k===i));$('grid').children[i].scrollIntoView({inline:'center',block:'nearest'});$('pvA').src=fileUrl(files[i]);$('hA').textContent=`Original · ${i+1} of ${files.length}`;schedule(0)}
-addEventListener('keydown',e=>{if(/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName))return;if(e.key==='ArrowRight')pick(sel+1);if(e.key==='ArrowLeft')pick(sel-1)});
+addEventListener('keydown',e=>{if(tool!=='img')return;if(/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName))return;if(e.key==='ArrowRight')pick(sel+1);if(e.key==='ArrowLeft')pick(sel-1)});
 async function add(paths){const found=await api.expand(paths);files=[...new Set([...files,...found])];render()}
 $('addF').onclick=async()=>add(await api.pickFiles());
 $('addD').onclick=async()=>{const d=await api.pickFolder();if(d)add([d])};
@@ -126,7 +159,7 @@ $('clr').onclick=()=>{files=[];render()};
 $('grid').onclick=e=>{if(e.target.dataset.i){files.splice(+e.target.dataset.i,1);render();return}
  const it=e.target.closest('.it');if(it)pick(+it.dataset.s)};
 const side=document.querySelector('aside');side.addEventListener('input',()=>schedule());side.addEventListener('click',e=>{if(e.target.closest('#rot'))schedule()});
-T.webview.getCurrentWebview().onDragDropEvent(e=>{const t=e.payload.type;document.body.classList.toggle('over',t==='over'||t==='enter');if(t==='drop')add(e.payload.paths)});
+T.webview.getCurrentWebview().onDragDropEvent(e=>{const t=e.payload.type;document.body.classList.toggle('over',t==='over'||t==='enter');if(t==='drop')(tool==='img'?add:pdfAdd)(e.payload.paths)});
 $('quality').oninput=e=>$('qv').textContent=e.target.value;
 const show=(ids,on)=>ids.forEach(i=>$(i).classList.toggle('hide',!on.includes(i)));
 $('resize').onchange=()=>{const v=$('resize').value;['pixels','percent','print','side'].forEach(m=>$('r-'+m).classList.toggle('hide',v!==m))};
@@ -146,4 +179,83 @@ $('go').onclick=async()=>{$('go').disabled=true;
  if(r.failed.length)alert(r.failed.map(f=>f.file+'\n'+f.error).join('\n\n'));
  else if(confirm('Finished! Open the output folder?'))api.reveal(outDir||files[0].replace(/[\\/][^\\/]*$/,''));
  $('go').disabled=false};
+
+/* ---------- PDF tools: merge / split / compress ---------- */
+let tool='img',pOut=null,pBusy=false;
+const PDF={merge:[],split:[],comp:[]};
+const TOOL={merge:{btn:'Merge',one:false,msg:'Add two or more PDFs to merge'},split:{btn:'Split',one:true,msg:'Choose a PDF to split'},comp:{btn:'Compress',one:false,msg:'Add PDFs to compress'}};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const baseName=p=>p.split(/[\\/]/).pop(),dirOf=p=>p.replace(/[\\/][^\\/]*$/,'');
+const pdfApi={
+ pick:async multi=>{const r=await T.dialog.open({multiple:multi,filters:[{name:'PDF',extensions:['pdf']}]});return r?(Array.isArray(r)?r:[r]):[]},
+ info:paths=>inv('pdf_info',{paths}),
+ merge:(paths,out)=>inv('pdf_merge',{paths,out}),
+ split:(path,mode,spec,outDir)=>inv('pdf_split',{path,mode,spec,outDir}),
+ comp:(files,level,outDir)=>inv('pdf_compress',{files,level,outDir}),
+};
+const setP=t=>$('pMsg').textContent=t;
+function setTool(t){tool=t;document.body.classList.toggle('pdf',t!=='img');
+ [...$('tabs').children].forEach(b=>b.classList.toggle('on',b.dataset.t===t));
+ if(t==='img')return;
+ ['merge','split','comp'].forEach(k=>$('o-'+k).classList.toggle('hide',k!==t));
+ $('o-save').classList.toggle('hide',t==='merge');$('pGo').textContent=TOOL[t].btn;pRender()}
+function pRender(keepMsg){const L=PDF[tool],m=TOOL[tool],ok=L.filter(f=>!f.error);
+ $('pDrop').classList.toggle('hide',L.length>0);$('pList').classList.toggle('hide',!L.length);
+ $('pList').innerHTML=L.map((f,i)=>`<div class="pr${f.error?' bad':''}" data-i="${i}">${tool==='merge'?`<span class="n">${i+1}</span>`:''}<div class="nm"><b title="${esc(f.path)}">${esc(baseName(f.path))}</b>${f.error?`<small class="er">${esc(f.error)}</small>`:`<small>${f.pages} page${f.pages===1?'':'s'} · ${fmtB(f.bytes)}</small>`}${f.note?` <small class="${f.noteCls||''}">${esc(f.note)}</small>`:''}</div>${tool==='merge'?`<button data-a="up"${i?'':' disabled'}>↑</button><button data-a="dn"${i<L.length-1?'':' disabled'}>↓</button>`:''}<button data-a="rm">✕</button></div>`).join('');
+ $('pAdd').textContent=m.one?'Choose PDF':'Add PDFs';
+ $('pGo').disabled=pBusy||(tool==='merge'?ok.length<2:ok.length<1);
+ $('sPages').textContent=tool==='split'&&ok[0]?`This PDF has ${ok[0].pages} pages.`:'';
+ if(keepMsg)return;$('pBar').firstChild.style.width='0';
+ setP(!L.length?m.msg:tool==='merge'?`${ok.length} PDFs · ${ok.reduce((a,f)=>a+f.pages,0)} pages in total`:tool==='split'&&ok[0]?`${ok[0].pages} pages`:`${ok.length} PDF${ok.length===1?'':'s'} ready`)}
+async function pdfAdd(paths){let list=(paths||[]).filter(p=>/\.pdf$/i.test(p));
+ if(!list.length){setP('Only PDF files can be added here');return}
+ const L=PDF[tool];
+ if(TOOL[tool].one)list=list.slice(0,1);else list=list.filter(p=>!L.some(f=>f.path===p));
+ if(!list.length)return;
+ setP('Reading '+list.length+' file'+(list.length===1?'':'s')+'…');
+ let infos;try{infos=await pdfApi.info(list)}catch(e){setP('Could not read the file: '+e);return}
+ if(TOOL[tool].one)L.length=0;
+ L.push(...infos);pRender()}
+$('tabs').onclick=e=>{const b=e.target.closest('button');if(b&&!pBusy)setTool(b.dataset.t)};
+$('pList').onclick=e=>{const b=e.target.closest('button[data-a]');if(!b||pBusy)return;
+ const i=+b.closest('.pr').dataset.i,L=PDF[tool];
+ if(b.dataset.a==='rm')L.splice(i,1);else{const j=b.dataset.a==='up'?i-1:i+1;[L[i],L[j]]=[L[j],L[i]]}
+ pRender()};
+$('pAdd').onclick=async()=>pdfAdd(await pdfApi.pick(!TOOL[tool].one));
+$('pClr').onclick=()=>{if(pBusy)return;PDF[tool].length=0;pRender()};
+$('pPick').onclick=async()=>{const d=await api.pickFolder();if(d){pOut=d;$('pOutShow').textContent=d}};
+const S_HELP={ranges:'Each range becomes its own file. Example: 1-3, 4-6, 7-',extract:'All listed pages go into one new file. Example: 1-3, 7',every:'Creates one file for every N pages. Use 1 to save every page separately.'};
+$('sMode').onchange=()=>{const v=$('sMode').value;$('sSpecL').classList.toggle('hide',v==='every');$('sNL').classList.toggle('hide',v!=='every');$('sHelp').textContent=S_HELP[v]};
+T.event.listen('pdf-progress',e=>{const{i,n}=e.payload;$('pBar').firstChild.style.width=(i/n*100)+'%';setP(`Working… ${i} / ${n}`)});
+$('pGo').onclick=async()=>{const t=tool,ok=PDF[t].filter(f=>!f.error);if(!ok.length||pBusy)return;
+ pBusy=true;$('pGo').disabled=true;$('pBar').firstChild.style.width='0';
+ try{
+  if(t==='merge'){
+   const first=ok[0].path,sep=first.includes('\\')?'\\':'/';
+   const out=await T.dialog.save({defaultPath:dirOf(first)+sep+'merged.pdf',filters:[{name:'PDF',extensions:['pdf']}]});
+   if(!out){setP('Cancelled');return}
+   setP('Merging…');
+   const r=await pdfApi.merge(ok.map(f=>f.path),out);
+   $('pBar').firstChild.style.width='100%';setP(`Merged ${ok.length} PDFs · ${r.pages} pages · ${fmtB(r.bytes)}`);
+   if(confirm('Finished! Open the output folder?'))api.reveal(dirOf(out));
+  }else if(t==='split'){
+   const mode=$('sMode').value,spec=mode==='every'?String(+$('sN').value||1):$('sSpec').value;
+   setP('Splitting…');
+   const out=await pdfApi.split(ok[0].path,mode,spec,pOut);
+   $('pBar').firstChild.style.width='100%';setP(`Created ${out.length} file${out.length===1?'':'s'}`);
+   if(confirm('Finished! Open the output folder?'))api.reveal(dirOf(out[0]));
+  }else{
+   setP('Compressing…');
+   const res=await pdfApi.comp(ok.map(f=>f.path),$('cLevel').value,pOut);
+   let b=0,a=0,first=null;
+   res.forEach(r=>{const f=PDF.comp.find(x=>x.path===r.file);if(!f)return;
+    if(r.error){f.note='Failed: '+r.error;f.noteCls='er'}
+    else if(r.skipped){f.note='Already well compressed, nothing saved';f.noteCls=''}
+    else{b+=r.before;a+=r.after;first=first||r.out;f.note=`→ ${fmtB(r.after)} (${Math.round((1-r.after/r.before)*100)}% smaller) · saved as ${baseName(r.out)}`;f.noteCls='ok'}});
+   pRender(true);$('pBar').firstChild.style.width='100%';
+   if(first){setP(`Saved ${Math.round((1-a/b)*100)}% · ${fmtB(b)} → ${fmtB(a)}`);if(confirm('Finished! Open the output folder?'))api.reveal(dirOf(first))}
+   else setP('No PDF could be made smaller');
+  }
+ }catch(e){alert(String(e));setP('Failed')}
+ finally{pBusy=false;pRender(true)}};
 </script></body></html>
